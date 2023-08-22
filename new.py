@@ -1,2 +1,2 @@
 print("it's mine")
-print("김기쁨")
+print('오늘 소주 2병 반 먹을것으로 예상aa')
