@@ -1,6 +1,4 @@
-print("it's mine")
-print("김기쁨")
-
-print("엉아지")
+print('오늘 소주 2병 반 먹을것으로 예상aa')
+print('누가 이런 예상하래 정성욱')
 print('술이제 너무 힘들어 얘들아')
 print('이제 날 주겨조...')
