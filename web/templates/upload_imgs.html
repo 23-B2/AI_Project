@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<html>
+  <head>
+    <title>Protect Your Art</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  </head>
+
+  <body>
+    <center><h1>Upload Page</h1></center>
+    <center><a href="/">홈페이지</a><br></center>
+    <hr width="100%" color="black"/>
+    <center><h3>Upload File!</h3></center>
+    <hr width="100%" color="black"/>
+
+    <form action="http://localhost:8080/fileUpload" method="POST" enctype="multipart/form-data">
+        <div class="file-upload-container">
+            <div class="file-upload">
+                <label class="file-label">Content Image</label>
+                <label for="contentFileInput" id="contentButton" class="file-button">
+                    <img id="contentPreview" class="preview-image" src="{{ url_for('static',filename='images/upload.png') }}" alt="Content Image Preview" />
+                </label>
+                <input type="file" class="file-input" id="contentFileInput" name="contentFile" required onchange="previewImage(this, 'contentPreview')" />
+
+            </div>
+            <div class="file-upload">
+                <label class="file-label">Style Transfer</label>
+                <button type="submit">
+                    <img id="transferredPreview" class="preview-image" src="{{ style_transferred_image_url or url_for('static', filename='images/upload.png') }}" alt="Style Transferred Image Preview" />
+                </button>
+            </div>
+            <div class="file-upload">
+                <label class="file-label">Style Image</label>
+                <input type="file" class="file-input" id="styleFileInput" name="styleFile" required onchange="previewImage(this, 'stylePreview')" />
+                <label for="styleFileInput" id="styleButton" class="file-button">
+                    <img id="stylePreview" class="preview-image" src="{{ url_for('static',filename='images/upload.png') }}" alt="Style Image Preview" />
+                </label>
+            </div>
+        </div>
+        <div class="file-upload">
+            <label class="file-label">Output</label>
+            <img id="noisePreview" class="preview-image" src="{{ url_for('static', filename='images/upload.png') }}" alt="Noise Image Preview" />
+        </div>
+    </form>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{{ url_for('static', filename='scripts/upload.js') }}"></script>
+  </body>
+</html>
