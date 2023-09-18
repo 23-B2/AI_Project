@@ -18,12 +18,8 @@ def page_not_found(error):
 #HTML 렌더링
 @app.route('/')
 def home_page():
-	return render_template('home.html')
-
-#업로드 HTML 렌더링
-@app.route('/upload')
-def upload_page():
 	return render_template('upload_imgs.html')
+
 
 transferred_status = {
 	"name": "transfer",
@@ -93,8 +89,12 @@ def get_noise_image():
 })
 
 @app.route('/temp/transfer/<filename>')
-def serve_temp_file(filename):
+def serve_transfer_file(filename):
     return send_from_directory(os.path.join('.', 'temp', 'transfer'), filename)
+
+@app.route('/temp/output/<filename>')
+def serve_output_file(filename):
+    return send_from_directory(os.path.join('.', 'temp', 'output'), filename)
 
 @app.route('/check_transferred_status')
 def check_transferred_status():
