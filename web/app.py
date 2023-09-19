@@ -58,10 +58,6 @@ def upload_file():
 def get_transferred_image():
 	content_filepath = request.form['content_filepath']
 	style_filepath = request.form['style_filepath']
-	print("="*30)
-	print("style transfer")
-	print(request)
-	print("="*30)
     # model running
 	transferred_filepath = get_transferred_file(content_filepath, style_filepath)
 
@@ -76,9 +72,6 @@ def get_transferred_image():
 def get_noise_image():
 	content_file = request.form['content_filepath']
 	style_transferred_file = request.form['transferred_filepath']
-	print("="*30)
-	print(request)
-	print("="*30)
 	# model running
 	noise_filepath = get_noise_file(content_file, style_transferred_file)
 
