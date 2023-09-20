@@ -1,9 +1,10 @@
 $(document).ready(function() {
-    const defaultTransferredImageUrl = "/static/images/default.png"; // New default image for transferredPreview
-    const defaultUploadImageUrl = "/static/images/upload.png"; // Old default image for content and style images
-    const waitingImageUrl = "/static/images/waiting.png";  // Image shown during waiting
+    let pValue = 0.07; // pValue를 전역으로 설정하여 다른 함수에서도 사용 가능하게 함
+    
+    const defaultTransferredImageUrl = "/static/images/default.png";
+    const defaultUploadImageUrl = "/static/images/upload.png";
+    const waitingImageUrl = "/static/images/waiting.png";
 
-    // Set default images initially
     $("#contentPreview").attr("src", defaultUploadImageUrl);
     $("#stylePreview").attr("src", defaultUploadImageUrl);
     $("#transferredPreview").attr("src", defaultTransferredImageUrl);
@@ -12,32 +13,38 @@ $(document).ready(function() {
     function updateTransferredPreview() {
         const contentFile = $("#contentFileInput")[0].files[0];
         const styleFile = $("#styleFileInput")[0].files[0];
-        if (contentFile && styleFile) {
+        if (contentFile && styleFile) {           
             $("#transferredPreview").attr("src", defaultUploadImageUrl);
         } else {
             $("#transferredPreview").attr("src", defaultTransferredImageUrl);
         }
     }
 
-    // Update transferredPreview whenever files are changed
     $("#contentFileInput").change(updateTransferredPreview);
     $("#styleFileInput").change(updateTransferredPreview);
 
     $("form").on("submit", function(event) {
         event.preventDefault();
-
-        // Check if both images are uploaded
+        const userInput = prompt("필터의 강도를 입력하세요. (0.01 ~ 0.1)");
+        if (userInput !== null) {
+            const floatValue = parseFloat(userInput);
+            if (floatValue >= 0.01 && floatValue <= 0.1) {
+                pValue = floatValue;  // Update pValue
+                console.log("User correctly entered value:", pValue);
+            } else {
+                alert("디폴트 값 0.07을 사용하겠습니다.");
+                pValue = 0.07; // Set to default value
+            }
+        }
         const contentFile = $("#contentFileInput")[0].files[0];
         const styleFile = $("#styleFileInput")[0].files[0];
 
         if (contentFile && styleFile) {
-            const waitingImageUrl = "/static/images/waiting.png";  // Flask의 url_for에 해당하는 경로
-
-            // Style Transfer Image와 Output Image를 waiting.png로 설정
             $("#transferredPreview").attr("src", waitingImageUrl);
             $("#noisePreview").attr("src", waitingImageUrl);
-            
+
             var formData = new FormData(this);
+            formData.append("p_value", pValue); // 여기서 pValue를 사용
 
             $.ajax({
                 url: "/fileUpload",
@@ -52,18 +59,15 @@ $(document).ready(function() {
                     }, function(response) {
                         if (response.status === "completed") {
                             $("#transferredPreview").attr("src", response.transferred_filepath);
-
-                            // get_noise_image 함수 호출
                             $.post("/getNoiseImage", {
                                 content_filepath: response.content_filepath,
-                                transferred_filepath: response.transferred_filepath
+                                transferred_filepath: response.transferred_filepath,
+                                p_value: pValue // Make sure pValue is defined globally or fetch it again
                             }, function(noiseResponse) {
                                 if (noiseResponse.status === "completed") {
                                     const noiseFilepath = noiseResponse.noise_filepath;
-                            
                                     // Preview the image
                                     $("#noisePreview").attr("src", noiseFilepath);
-                            
                                     // Automatically download the image
                                     downloadImage(noiseFilepath, "output_image.png");
                                 } else {
@@ -74,6 +78,7 @@ $(document).ready(function() {
                             setTimeout(checkTransferredStatus, 2000);
                         }
                     });
+
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     alert("Error occurred: " + textStatus + " " + errorThrown);
@@ -82,6 +87,7 @@ $(document).ready(function() {
         }
     });
 });
+
 
 function checkTransferredStatus() {
     $.get("/check_transferred_status", function(data) {
@@ -118,11 +124,12 @@ function previewImage(input, previewId) {
 }
 
 function downloadImage(url, filename) {
-    var link = document.createElement("a");
-    link.href = url;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    fetch(url).then(response => response.blob()).then(blob => {
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    });
 }
-

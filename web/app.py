@@ -72,8 +72,10 @@ def get_transferred_image():
 def get_noise_image():
 	content_file = request.form['content_filepath']
 	style_transferred_file = request.form['transferred_filepath']
+	p_value = request.form['p_value']
+
 	# model running
-	noise_filepath = get_noise_file(content_file, style_transferred_file)
+	noise_filepath = get_noise_file(content_file, style_transferred_file, p_value)
 
 	return jsonify({
 	"name": "noise",
